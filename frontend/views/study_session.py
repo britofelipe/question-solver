@@ -14,6 +14,11 @@ def render(navigate_to):
 
     q = questions[idx]
     
+    # Context Header
+    context_name = st.session_state.get("study_context_name", "")
+    if context_name:
+        st.caption(f"📖 Study: {context_name}")
+
     # Header with actions
     c1, c2 = st.columns([5, 1])
     with c1:

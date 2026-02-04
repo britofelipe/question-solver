@@ -55,7 +55,12 @@ def render(navigate_to, navigate_up):
             st.rerun()
             
         def on_study(nb):
+            # Construct full path name for context
+            path_names = [b['name'] for b in st.session_state.breadcrumbs] + [nb['name']]
+            full_context_name = " > ".join(path_names)
+            
             st.session_state.selected_notebook_for_study = nb
+            st.session_state.study_context_name = full_context_name # Store context
             navigate_to("study_setup")
             
         def on_delete(id):
@@ -77,15 +82,25 @@ def render(navigate_to, navigate_up):
         questions = API.get_questions(st.session_state.current_notebook_id)
         if questions:
             for q in questions:
-                with st.expander(f"{q['content'][:50]}... ({q['type']})"):
-                    st.write(f"**Question:** {q['content']}")
-                    st.write(f"**Answer:** {q['correct_answer']}")
-                    if st.button("Delete Question", key=f"del_q_{q['id']}"):
+                # Use columns to put Delete button outside the expander
+                c_content, c_del = st.columns([6, 1])
+                
+                with c_content:
+                    # Summary inside expander
+                    content_preview = f"{q['content'][:80]}..." if len(q['content']) > 80 else q['content']
+                    with st.expander(f"{content_preview} ({q['type']})"):
+                        st.markdown(f"**Question:**\n{q['content']}")
+                        st.markdown(f"**Correct Answer:**\n{q['correct_answer']}")
+                        st.markdown(f"**Explanation:**\n{q['explanation']}")
+                        
+                with c_del:
+                    st.write("") # Spacer to align with expander
+                    if st.button("🗑️", key=f"del_q_{q['id']}", help="Delete Question"):
                         if API.delete_question(q['id']):
-                            st.success("Deleted!")
+                            st.toast("Question deleted!", icon="🗑️")
                             st.rerun()
                         else:
-                            st.error("Failed to delete.")
+                            st.error("Error")
         else:
             st.info("No questions in this notebook.")
 

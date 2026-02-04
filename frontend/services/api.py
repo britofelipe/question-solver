@@ -36,18 +36,22 @@ class API:
     def get_study_questions(notebook_id, mode="all", randomize=False):
         try:
             params = {"mode": mode, "randomize": randomize}
-            res = requests.get(f"{API_URL}/questions/study/{notebook_id}", params=params)
+            # Route is /study/{id}, not /questions/study/{id}
+            res = requests.get(f"{API_URL}/study/{notebook_id}", params=params)
             if res.status_code == 200:
                 return res.json()
+            st.error(f"Backend Error ({res.status_code}): {res.text}")
             return []
-        except Exception:
+        except Exception as e:
+            st.error(f"Connection Error: {e}")
             return []
 
     @staticmethod
     def submit_attempt(question_id, selected_option):
         try:
             payload = {"question_id": question_id, "selected_option": selected_option}
-            res = requests.post(f"{API_URL}/questions/attempt/", json=payload)
+            # Route is /attempt/, not /questions/attempt/
+            res = requests.post(f"{API_URL}/attempt/", json=payload)
             if res.status_code == 200:
                 return res.json()
             return None

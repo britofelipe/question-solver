@@ -5,11 +5,13 @@ import pandas as pd
 
 def render(navigate_to):
     nb = st.session_state.get("selected_notebook_for_study")
+    context_name = st.session_state.get("study_context_name", nb.get('name') if nb else "Unknown")
+    
     if not nb:
         navigate_to("home")
         return
 
-    st.title(f"📖 Study: {nb['name']}")
+    st.title(f"📖 Study: {context_name}")
     
     if st.button("← Back"):
         navigate_to("home")
@@ -46,6 +48,14 @@ def render(navigate_to):
                 st.session_state.study_queue = questions
                 st.session_state.current_question_index = 0
                 navigate_to("study_session")
+                # Ensure rerun happens if navigate_to doesn't trigger it immediately (though it should)
+                # It seems in some streamlit versions/contexts updates to session state 
+                # inside buttons might not persist if page change happens too fast? 
+                # Actually, navigate_to calls rerun. 
+                # Let's clean up old session state vars just in case.
+                keys_to_clear = [k for k in st.session_state.keys() if k.startswith("answered_") or k.startswith("result_")]
+                for k in keys_to_clear:
+                    del st.session_state[k]
             
     # Quick Stats Text
     st.markdown("### Details")
