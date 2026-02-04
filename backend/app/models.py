@@ -1,34 +1,7 @@
-from typing import List, Optional, Dict, Any
-from sqlmodel import Field, SQLModel, Relationship, create_engine, Session
+from typing import List, Optional
+from sqlmodel import Field, SQLModel, Relationship
 from sqlalchemy import Column, JSON
-import os
 from datetime import datetime, timezone
-
-# Database Connection
-DATABASE_URL = os.getenv("DATABASE_URL")
-engine = create_engine(DATABASE_URL)
-
-def get_session():
-    with Session(engine) as session:
-        yield session
-
-import time
-from sqlalchemy.exc import OperationalError
-
-def init_db():
-    retries = 5
-    for i in range(retries):
-        try:
-            SQLModel.metadata.create_all(engine)
-            print("Database initialized successfully.")
-            return
-        except OperationalError as e:
-            if i == retries - 1:
-                raise e
-            print(f"Database not ready, waiting... ({i+1}/{retries})")
-            time.sleep(2)
-
-# Models
 
 class Notebook(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -37,7 +10,6 @@ class Notebook(SQLModel, table=True):
     
     # Relationships
     questions: List["Question"] = Relationship(back_populates="notebook")
-    # Note: Self-referential relationships in SQLModel can be tricky, using simple ID for now for recursion logic
 
 class Question(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
