@@ -36,8 +36,10 @@ def render(navigate_to):
 
     with col_config:
         st.subheader("Session Configuration")
-        mode = st.selectbox("Mode", ["all", "incorrect", "unresolved"], format_func=lambda x: x.capitalize())
-        randomize = st.checkbox("Randomize Order", value=True)
+        # Default to "unresolved" (index 2)
+        mode = st.selectbox("Mode", ["all", "incorrect", "unresolved"], index=2, format_func=lambda x: x.capitalize())
+        # Default randomize to False
+        randomize = st.checkbox("Randomize Order", value=False)
         
         st.write("")
         if st.button("Start Session", type="primary", use_container_width=True):
