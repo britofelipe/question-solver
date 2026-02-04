@@ -16,20 +16,20 @@ Example JSON:
 {
   "questions": [
     {
-      "content": "What is the capital of France?",
-      "type": "multiple_choice",
-      "language": "en",
-      "options": ["London", "Berlin", "Paris", "Madrid"],
-      "correct_answer": "Paris",
-      "explanation": "Paris is the capital city of France."
+      "content": "",
+      "type": "",
+      "language": "",
+      "options": [],
+      "correct_answer": "",
+      "explanation": ""
     },
     {
-      "content": "Water boils at 100 degrees Celsius at sea level.",
-      "type": "true_false",
-      "language": "en",
-      "options": ["True", "False"],
-      "correct_answer": "True",
-      "explanation": "At standard atmospheric pressure, the boiling point of water is 100°C."
+      "content": "",
+      "type": "",
+      "language": "",
+      "options": [],
+      "correct_answer": "",
+      "explanation": ""
     }
   ]
 }

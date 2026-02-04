@@ -16,20 +16,20 @@ Exemple JSON:
 {
   "questions": [
     {
-      "content": "Quelle est la capitale de la France ?",
-      "type": "multiple_choice",
-      "language": "fr",
-      "options": ["Londres", "Berlin", "Paris", "Madrid"],
-      "correct_answer": "Paris",
-      "explanation": "Paris est la capitale de la France."
+      "content": "",
+      "type": "",
+      "language": "",
+      "options": [],
+      "correct_answer": "",
+      "explanation": ""
     },
     {
-      "content": "L'eau bout à 100 degrés Celsius au niveau de la mer.",
-      "type": "true_false",
-      "language": "fr",
-      "options": ["Vrai", "Faux"],
-      "correct_answer": "Vrai",
-      "explanation": "À la pression atmosphérique standard, le point d'ébullition de l'eau est de 100°C."
+      "content": "",
+      "type": "",
+      "language": "",
+      "options": [],
+      "correct_answer": "",
+      "explanation": ""
     }
   ]
 }
