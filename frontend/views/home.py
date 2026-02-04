@@ -74,22 +74,6 @@ def render(navigate_to, navigate_up):
         if not st.session_state.current_notebook_id:
              st.info("No notebooks created yet.")
 
-    # Create Notebook
-    # Always visible, moved here as requested
-    st.markdown("---")
-    
-    current_location = st.session_state.breadcrumbs[-1]['name'] if st.session_state.breadcrumbs else "Root"
-    st.markdown(f"### ➕ New notebook inside of **{current_location}**")
-    
-    c1, c2 = st.columns([3, 1])
-    with c1:
-        new_nb_name = st.text_input("New Notebook Name", placeholder="e.g. History", label_visibility="collapsed")
-    with c2:
-        if st.button("Create", use_container_width=True):
-            if new_nb_name:
-                API.create_notebook(new_nb_name, st.session_state.current_notebook_id)
-                st.rerun()
-
     # Question Management (Only if inside a notebook)
     if st.session_state.current_notebook_id:
         st.markdown("---")
@@ -138,7 +122,7 @@ def render(navigate_to, navigate_up):
         else:
             st.info("No questions in this notebook.")
 
-        # Upload Section
+        # Upload Section (Moved above Create Notebook)
         st.markdown("---")
         st.subheader("📤 Upload Questions")
         json_input = st.text_area("Paste JSON here", height=150)
@@ -153,3 +137,19 @@ def render(navigate_to, navigate_up):
                     st.error("Failed to upload.")
             except json.JSONDecodeError:
                 st.error("Invalid JSON format.")
+
+    # Create Notebook
+    # Always visible, moved here as requested
+    st.markdown("---")
+    
+    current_location = st.session_state.breadcrumbs[-1]['name'] if st.session_state.breadcrumbs else "Root"
+    st.markdown(f"### ➕ New notebook inside of **{current_location}**")
+    
+    c1, c2 = st.columns([3, 1])
+    with c1:
+        new_nb_name = st.text_input("New Notebook Name", placeholder="e.g. History", label_visibility="collapsed")
+    with c2:
+        if st.button("Create", use_container_width=True):
+            if new_nb_name:
+                API.create_notebook(new_nb_name, st.session_state.current_notebook_id)
+                st.rerun()
