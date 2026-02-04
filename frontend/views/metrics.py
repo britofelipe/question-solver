@@ -18,11 +18,20 @@ def render(navigate_to):
     pending = global_stats['total_questions'] - global_stats['attempted']
     c4.metric("Pending", pending)
     
+    st.markdown("### ⏱️ Activity")
+    c_today, c_week, c_month, c_avg = st.columns(4)
+    c_today.metric("Questions Today", global_stats.get('questions_today', 0))
+    c_week.metric("Questions this Week", global_stats.get('questions_week', 0))
+    c_month.metric("Questions this Month", global_stats.get('questions_month', 0))
+    # Placeholder for average time if implemented later
+    # c_avg.metric("Avg Time", "N/A") 
+
     st.markdown("---")
     
-    col_chart, col_breakdown = st.columns([1, 2])
+    col_chart, col_breakdown = st.columns([1, 1])
     
     with col_chart:
+        st.subheader("Global Process")
         # Pie Chart
         data = {
             "Status": ["Correct", "Incorrect", "Pending"],
@@ -35,26 +44,51 @@ def render(navigate_to):
         st.plotly_chart(fig, use_container_width=True)
 
     with col_breakdown:
-        st.subheader("Notebook Performance")
-        # Get all root notebooks for breakdown
-        notebooks = API.get_notebooks()
-        
-        nb_data = []
-        for nb in notebooks:
-            stats = API.get_stats(nb['id'])
+        st.subheader("Activity by Category")
+        cat_stats = global_stats.get('category_stats', {})
+        if cat_stats:
+            df_cat = pd.DataFrame(list(cat_stats.items()), columns=['Category', 'Questions'])
+            fig_bar_cat = px.bar(df_cat, x='Category', y='Questions', title='Questions Answered per Category',
+                                 color='Questions', color_continuous_scale='Viridis')
+            st.plotly_chart(fig_bar_cat, use_container_width=True)
+        else:
+             st.info("No activity recorded yet.")
+
+    st.markdown("---")
+    st.subheader("Notebook Performance (Accuracy)")
+    
+    # Helper to flatten notebooks
+    def get_all_notebooks_flat(nodes):
+        flat = []
+        for node in nodes:
+            flat.append(node)
+            if node.get('sub_notebooks'):
+                flat.extend(get_all_notebooks_flat(node['sub_notebooks']))
+        return flat
+
+    notebooks_tree = API.get_notebooks()
+    all_notebooks = get_all_notebooks_flat(notebooks_tree)
+    
+    nb_data = []
+    for nb in all_notebooks:
+        stats = API.get_stats(nb['id'])
+        # Only show notebooks that have had some activity or questions to reduce clutter
+        # Or at least show all. Let's show all for now.
+        if stats['total_questions'] > 0:
             nb_data.append({
                 "Notebook": nb['name'],
-                "Accuracy": stats['accuracy'],
+                "Accuracy": stats['accuracy'] * 100, # Scale to 0-100
                 "Questions": stats['total_questions']
             })
-            
-        if nb_data:
-            df_nb = pd.DataFrame(nb_data)
-            fig_bar = px.bar(df_nb, x='Notebook', y='Accuracy', title='Accuracy per Notebook',
-                             color='Accuracy', color_continuous_scale='Bluered_r', range_y=[0, 1])
-            st.plotly_chart(fig_bar, use_container_width=True)
-        else:
-            st.info("No notebooks available for breakdown.")
+        
+    if nb_data:
+        df_nb = pd.DataFrame(nb_data)
+        fig_bar = px.bar(df_nb, x='Notebook', y='Accuracy', title='Accuracy per Notebook (%)',
+                         color='Accuracy', color_continuous_scale='Bluered_r', range_y=[0, 100],
+                         text_auto='.1f')
+        st.plotly_chart(fig_bar, use_container_width=True)
+    else:
+        st.info("No notebook activity to display.")
 
     if st.button("← Back to Home"):
         navigate_to("home")

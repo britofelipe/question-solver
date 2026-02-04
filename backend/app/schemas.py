@@ -34,6 +34,8 @@ class AttemptResponse(BaseModel):
     correct_answer: str
     explanation: str
 
+from typing import Dict
+
 # Stats Schema
 class Stats(BaseModel):
     total_questions: int
@@ -41,3 +43,10 @@ class Stats(BaseModel):
     correct: int
     incorrect: int
     accuracy: float
+    # Time-based metrics
+    questions_today: int
+    questions_week: int
+    questions_month: int
+    mean_time_seconds: float = 0.0 # Placeholder for future
+    # Category breakdown
+    category_stats: Dict[str, int] = {}
