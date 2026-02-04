@@ -17,8 +17,11 @@ def render_notebook_card(notebook, on_click_open, on_click_study, on_click_delet
             if st.button("Study", key=f"study_{notebook['id']}"):
                 on_click_study(notebook)
         with b3:
-            if st.button("🗑", key=f"del_{notebook['id']}"):
-                on_click_delete(notebook['id'])
+            with st.popover("🗑", help="Delete Notebook"):
+                st.write("Are you sure you want to delete this notebook?")
+                st.warning("This action cannot be undone.")
+                if st.button("Confirm Delete", key=f"conf_del_{notebook['id']}", type="primary"):
+                    on_click_delete(notebook['id'])
     st.write("") 
 
 def render_question_card(question, index, total):
