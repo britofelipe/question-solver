@@ -69,10 +69,50 @@ class API:
                 "accuracy": 0.0
             }
         except Exception:
-             return {
+            return {
                 "total_questions": 0,
                 "attempted": 0,
                 "correct": 0,
                 "incorrect": 0,
                 "accuracy": 0.0
             }
+
+    @staticmethod
+    def get_global_stats():
+        try:
+            res = requests.get(f"{API_URL}/stats/global")
+            if res.status_code == 200:
+                return res.json()
+            return {
+                "total_questions": 0,
+                "attempted": 0,
+                "correct": 0,
+                "incorrect": 0,
+                "accuracy": 0.0
+            }
+        except Exception:
+            return {
+                "total_questions": 0,
+                "attempted": 0,
+                "correct": 0,
+                "incorrect": 0,
+                "accuracy": 0.0
+            }
+
+    @staticmethod
+    def get_questions(notebook_id):
+        try:
+            res = requests.get(f"{API_URL}/questions/notebook/{notebook_id}")
+            if res.status_code == 200:
+                return res.json()
+            return []
+        except Exception:
+            return []
+
+    @staticmethod
+    def delete_question(question_id):
+        try:
+             res = requests.delete(f"{API_URL}/questions/{question_id}")
+             return res.status_code == 200
+        except Exception:
+             return False
