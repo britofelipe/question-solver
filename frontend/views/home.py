@@ -93,7 +93,25 @@ def render(navigate_to, navigate_up):
     # Question Management (Only if inside a notebook)
     if st.session_state.current_notebook_id:
         st.markdown("---")
-        st.subheader("📝 Questions in this Notebook")
+        
+        c_head, c_study = st.columns([4, 1])
+        with c_head:
+            st.subheader("📝 Questions in this Notebook")
+        with c_study:
+            if st.button("📖 Study Now", use_container_width=True, type="primary"):
+                 # Current path logic for context
+                 path_names = [b['name'] for b in st.session_state.breadcrumbs]
+                 # The last breadcrumb is the current notebook
+                 current_nb_name = path_names[-1]
+                 full_context_name = " > ".join(path_names)
+                 
+                 # We need the current notebook object, ID is st.session_state.current_notebook_id
+                 st.session_state.selected_notebook_for_study = {
+                     "id": st.session_state.current_notebook_id, 
+                     "name": current_nb_name
+                 }
+                 st.session_state.study_context_name = full_context_name
+                 navigate_to("study_setup")
         
         questions = API.get_questions(st.session_state.current_notebook_id)
         if questions:
