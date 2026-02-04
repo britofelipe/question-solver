@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.core.database import init_db
-from app.routers import notebooks, questions, stats
+from app.routers import notebooks, questions, stats, tools
 
 app = FastAPI(title="Question Solver API")
 
@@ -8,6 +8,7 @@ app = FastAPI(title="Question Solver API")
 app.include_router(notebooks.router)
 app.include_router(questions.router)
 app.include_router(stats.router)
+app.include_router(tools.router)
 
 @app.get("/")
 def read_root():

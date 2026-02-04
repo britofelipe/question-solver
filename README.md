@@ -49,6 +49,13 @@ docker compose up --build
     - **Unresolved**: Questions you haven't answered yet.
 - Receive immediate feedback with the answer explanation.
 
+## 🛠️ Tools
+
+### PDF Splitter
+- Go to `Tools` > `PDF Splitter`.
+- Upload a large PDF and specify the number of pages per chunk.
+- Download a ZIP file containing the split PDFs to easily feed into LLMs.
+
 ## 🧪 Tests
 
 To run the automated backend tests:

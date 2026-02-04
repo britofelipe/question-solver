@@ -1,5 +1,5 @@
 import streamlit as st
-from frontend.services.api import API
+from services.api import API
 
 def render_notebook_card(notebook, on_click_open, on_click_study, on_click_delete):
     with st.container():

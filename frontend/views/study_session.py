@@ -1,6 +1,6 @@
 import streamlit as st
-from frontend.services.api import API
-from frontend.components.ui import render_question_card, render_result_message
+from services.api import API
+from components.ui import render_question_card, render_result_message
 
 def render(navigate_to):
     questions = st.session_state.get("study_queue", [])

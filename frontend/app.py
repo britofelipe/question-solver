@@ -1,6 +1,6 @@
 import streamlit as st
-from frontend.utils.styles import load_css
-from frontend.views import home, study_setup, study_session
+from utils.styles import load_css
+from views import home, study_setup, study_session, tools
 
 # Page Configuration
 st.set_page_config(page_title="QuestMaster", page_icon="📚", layout="wide")
@@ -43,3 +43,5 @@ elif st.session_state.page == "study_setup":
     study_setup.render(navigate_to)
 elif st.session_state.page == "study_session":
     study_session.render(navigate_to)
+elif st.session_state.page == "tools":
+    tools.render(navigate_to)

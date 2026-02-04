@@ -1,7 +1,7 @@
 import streamlit as st
 import json
-from frontend.services.api import API
-from frontend.components.ui import render_notebook_card
+from services.api import API
+from components.ui import render_notebook_card
 
 def get_current_notebook_children(notebooks, target_id):
     if target_id is None:
@@ -36,15 +36,19 @@ def render(navigate_to, navigate_up):
     current_children = get_current_notebook_children(all_notebooks, st.session_state.current_notebook_id)
     
     # Action Bar
-    c1, c2, c3 = st.columns([2, 1, 1])
+    c1, c2, c3, c4 = st.columns([2, 1, 1, 1])
     with c1:
         new_nb_name = st.text_input("New Notebook Name", placeholder="e.g. Mathematics")
     with c2:
         st.write("") 
-        if st.button("➕ Create Notebook", use_container_width=True):
+        if st.button("➕ Create", use_container_width=True):
             if new_nb_name:
                 API.create_notebook(new_nb_name, st.session_state.current_notebook_id)
                 st.rerun()
+    with c4:
+        st.write("")
+        if st.button("🛠️ Tools", use_container_width=True):
+             navigate_to("tools")
     
     st.markdown("---")
     

@@ -1,5 +1,5 @@
 import streamlit as st
-from frontend.services.api import API
+from services.api import API
 
 def render(navigate_to):
     nb = st.session_state.get("selected_notebook_for_study")

@@ -137,3 +137,34 @@ def test_question_flow(client: TestClient):
     assert stats["correct"] == 1
     assert stats["incorrect"] == 1
     assert stats["accuracy"] == 0.5
+
+def test_pdf_split(client: TestClient):
+    # Create a dummy PDF in memory
+    from pypdf import PdfWriter
+    import io
+    
+    writer = PdfWriter()
+    writer.add_blank_page(width=100, height=100) # Page 1
+    writer.add_blank_page(width=100, height=100) # Page 2
+    writer.add_blank_page(width=100, height=100) # Page 3
+    
+    pdf_bytes = io.BytesIO()
+    writer.write(pdf_bytes)
+    pdf_bytes.seek(0)
+    
+    # Send to API
+    files = {"file": ("test.pdf", pdf_bytes, "application/pdf")}
+    data = {"chunk_size": 2}
+    
+    res = client.post("/tools/split-pdf", files=files, data=data)
+    assert res.status_code == 200
+    assert res.headers["content-type"] == "application/zip"
+    
+    # Verify ZIP content
+    import zipfile
+    zip_buffer = io.BytesIO(res.content)
+    with zipfile.ZipFile(zip_buffer, "r") as z:
+        # Should have split into 2 files: 1-2 (2 pages) and 3-3 (1 page)
+        assert len(z.namelist()) == 2
+        assert "split_1-2.pdf" in z.namelist()
+        assert "split_3-3.pdf" in z.namelist()
