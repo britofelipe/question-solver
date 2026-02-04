@@ -20,23 +20,25 @@ def render(navigate_to):
         st.caption(f"📖 Study: {context_name}")
 
     # Header with actions
-    c1, c2 = st.columns([5, 1])
+    c1, c2, c3 = st.columns([4, 1, 1])
     with c1:
         st.subheader(f"Question {idx + 1} of {len(questions)}")
+    
     with c2:
-        if st.button("🗑 Delete", key=f"del_study_{q['id']}"):
+        if st.button("⏹ Stop", help="Exit Session"):
+            navigate_to("study_setup")
+            
+    with c3:
+        if st.button("🗑 Delete", key=f"del_study_{q['id']}", help="Delete Question"):
             if API.delete_question(q['id']):
-                # Remove from queue and rerun
                 questions.pop(idx)
                 st.session_state.study_queue = questions
-                # Clean up state for this index if needed, but since we pop list shifts
-                # It's safer to clear answer state for the current index just in case
                 if f"answered_{idx}" in st.session_state:
                      del st.session_state[f"answered_{idx}"]
                 if f"result_{idx}" in st.session_state:
                      del st.session_state[f"result_{idx}"]
                 
-                st.success("Deleted")
+                st.toast("Deleted")
                 st.rerun()
     
     render_question_card(q, idx, len(questions))
