@@ -168,3 +168,44 @@ def test_pdf_split(client: TestClient):
         assert len(z.namelist()) == 2
         assert "split_1-2.pdf" in z.namelist()
         assert "split_3-3.pdf" in z.namelist()
+
+def test_question_management(client: TestClient):
+    # Setup: Create notebook and upload question
+    res = client.post("/notebooks/", json={"name": "Management"})
+    nb_id = res.json()["id"]
+    
+    questions_payload = {
+        "questions": [
+            {
+                "content": "To be deleted",
+                "type": "true_false",
+                "language": "en",
+                "options": ["True", "False"],
+                "correct_answer": "True",
+                "explanation": "..."
+            }
+        ]
+    }
+    client.post(f"/questions/upload/{nb_id}", json=questions_payload)
+    
+    # 1. List Questions
+    res = client.get(f"/questions/notebook/{nb_id}")
+    assert res.status_code == 200
+    questions = res.json()
+    assert len(questions) == 1
+    q_id = questions[0]["id"]
+    
+    # 2. Delete Question
+    res = client.delete(f"/questions/{q_id}")
+    assert res.status_code == 200
+    
+    # 3. Verify Deletion
+    res = client.get(f"/questions/notebook/{nb_id}")
+    assert res.json() == []
+
+def test_global_stats(client: TestClient):
+    res = client.get("/stats/global")
+    assert res.status_code == 200
+    stats = res.json()
+    assert "total_questions" in stats
+    assert "accuracy" in stats

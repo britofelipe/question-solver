@@ -27,6 +27,17 @@ def get_study_questions(
 ):
     return QuestionService.get_study_questions(session, notebook_id, mode, randomize)
 
+@router.get("/questions/notebook/{notebook_id}", response_model=List[Question])
+def get_questions_by_notebook(notebook_id: int, session: Session = Depends(get_session)):
+    return QuestionService.get_by_notebook(session, notebook_id)
+
+@router.delete("/questions/{question_id}")
+def delete_question(question_id: int, session: Session = Depends(get_session)):
+    success = QuestionService.delete_question(session, question_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Question not found")
+    return {"ok": True}
+
 @router.post("/attempt/", response_model=AttemptResponse)
 def submit_attempt(attempt: AttemptCreate, session: Session = Depends(get_session)):
     result = QuestionService.submit_attempt(session, attempt.question_id, attempt.selected_option)

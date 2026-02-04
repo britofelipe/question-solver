@@ -63,6 +63,28 @@ class QuestionService:
         return filtered_questions
 
     @staticmethod
+    def get_by_notebook(session: Session, notebook_id: int) -> List[Question]:
+        """Get all questions directly in a notebook (no recursion)."""
+        statement = select(Question).where(Question.notebook_id == notebook_id)
+        return session.exec(statement).all()
+
+    @staticmethod
+    def delete_question(session: Session, question_id: int) -> bool:
+        question = session.get(Question, question_id)
+        if not question:
+            return False
+        
+        # Attempts should be cascaded or manually deleted if cascade not set in model
+        # For safety/SQLModel quirks, let's delete attempts first
+        attempts = session.exec(select(Attempt).where(Attempt.question_id == question_id)).all()
+        for attempt in attempts:
+            session.delete(attempt)
+            
+        session.delete(question)
+        session.commit()
+        return True
+
+    @staticmethod
     def submit_attempt(session: Session, question_id: int, selected_option: str):
         question = session.get(Question, question_id)
         if not question:

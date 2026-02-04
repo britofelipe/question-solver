@@ -1,10 +1,14 @@
-from pypdf import PdfReader, PdfWriter
 import io
 import zipfile
+import sys
+from pypdf import PdfReader, PdfWriter
 
 class PdfService:
     @staticmethod
     def split_pdf(file_bytes: bytes, chunk_size: int) -> bytes:
+        # Increase recursion limit for complex PDFs
+        sys.setrecursionlimit(5000)
+        
         reader = PdfReader(io.BytesIO(file_bytes))
         total_pages = len(reader.pages)
         

@@ -6,6 +6,10 @@ from app.services.stats_service import StatsService
 
 router = APIRouter(prefix="/stats", tags=["Stats"])
 
+@router.get("/global", response_model=Stats)
+def get_global_stats(session: Session = Depends(get_session)):
+    return StatsService.get_global_stats(session)
+
 @router.get("/{notebook_id}", response_model=Stats)
 def get_stats(notebook_id: int, session: Session = Depends(get_session)):
     return StatsService.get_stats(session, notebook_id)

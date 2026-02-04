@@ -14,22 +14,48 @@ def render(navigate_to):
 
     q = questions[idx]
     
+    # Header with actions
+    c1, c2 = st.columns([5, 1])
+    with c1:
+        st.subheader(f"Question {idx + 1} of {len(questions)}")
+    with c2:
+        if st.button("🗑 Delete", key=f"del_study_{q['id']}"):
+            if API.delete_question(q['id']):
+                # Remove from queue and rerun
+                questions.pop(idx)
+                st.session_state.study_queue = questions
+                # Clean up state for this index if needed, but since we pop list shifts
+                # It's safer to clear answer state for the current index just in case
+                if f"answered_{idx}" in st.session_state:
+                     del st.session_state[f"answered_{idx}"]
+                if f"result_{idx}" in st.session_state:
+                     del st.session_state[f"result_{idx}"]
+                
+                st.success("Deleted")
+                st.rerun()
+    
     render_question_card(q, idx, len(questions))
     
     # State management for current question
-    if f"answered_{idx}" not in st.session_state:
-        st.session_state[f"answered_{idx}"] = False
-        st.session_state[f"result_{idx}"] = None
+    # Note: If we shuffle, IDs are better keys, but index is simple for now. 
+    # With delete separate, using index can be tricky if not cleared.
+    # Let's use q['id'] for state keys to be safe against shifts
+    
+    q_key = f"q_{q['id']}"
+    
+    if f"answered_{q_key}" not in st.session_state:
+        st.session_state[f"answered_{q_key}"] = False
+        st.session_state[f"result_{q_key}"] = None
 
-    answered = st.session_state[f"answered_{idx}"]
-    result = st.session_state[f"result_{idx}"]
+    answered = st.session_state[f"answered_{q_key}"]
+    result = st.session_state[f"result_{q_key}"]
 
     if not answered:
-        selected = st.radio("Choose your answer:", q['options'], key=f"q_{idx}")
+        selected = st.radio("Choose your answer:", q['options'], key=f"radio_{q_key}")
         if st.button("Confirm Answer"):
             res = API.submit_attempt(q['id'], selected)
-            st.session_state[f"result_{idx}"] = res
-            st.session_state[f"answered_{idx}"] = True
+            st.session_state[f"result_{q_key}"] = res
+            st.session_state[f"answered_{q_key}"] = True
             st.rerun()
     else:
         render_result_message(result['is_correct'], result['explanation'])

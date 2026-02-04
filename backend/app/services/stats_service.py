@@ -42,3 +42,34 @@ class StatsService:
             incorrect=incorrect_count,
             accuracy=accuracy
         )
+
+    @staticmethod
+    def get_global_stats(session: Session) -> Stats:
+        questions = session.exec(select(Question)).all()
+        
+        total = len(questions)
+        attempted_count = 0
+        correct_count = 0
+        incorrect_count = 0
+        
+        for q in questions:
+            latest = session.exec(
+                select(Attempt).where(Attempt.question_id == q.id).order_by(Attempt.timestamp.desc())
+            ).first()
+            
+            if latest:
+                attempted_count += 1
+                if latest.is_correct:
+                    correct_count += 1
+                else:
+                    incorrect_count += 1
+                    
+        accuracy = (correct_count / attempted_count) if attempted_count > 0 else 0.0
+        
+        return Stats(
+            total_questions=total,
+            attempted=attempted_count,
+            correct=correct_count,
+            incorrect=incorrect_count,
+            accuracy=accuracy
+        )
